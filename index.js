@@ -22,7 +22,13 @@ const getMimeType = url => {
     if (mime.getType(url) === 'application/x-msdownload') return 'text/html';
     return mime.getType(url) || 'text/html'; // if there is no extension return as html
 };
-
+const config = {
+    responseType: 'arraybuffer',
+    headers: {
+        "Referer": "http://demo.cvm.vn/",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+    }
+};
 app.get('/', (req, res) => {
     const {
         url
@@ -31,13 +37,7 @@ app.get('/', (req, res) => {
         res.type('text/html');
         return res.end("You need to specify <code>url</code> query parameter");
     }
-    const config = {
-        responseType: 'arraybuffer',
-        headers: {
-            "Referer": "http://demo.cvm.vn/",
-            "Referrer-Policy": "strict-origin-when-cross-origin"
-        }
-    };
+   
     axios.get(url, config) // set response type array buffer to access raw data
         .then(({
             data
@@ -79,9 +79,7 @@ app.get('/*', (req, res) => {
     }
 
     const url = lastProtoHost + req.originalUrl;
-    axios.get(url, {
-            responseType: 'arraybuffer'
-        }) // set response type array buffer to access raw data
+    axios.get(url, config) // set response type array buffer to access raw data
         .then(({
             data
         }) => {
