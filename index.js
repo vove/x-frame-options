@@ -2,7 +2,9 @@ const express = require('express');
 const axios = require('axios');
 const mime = require('mime');
 const morgan = require('morgan');
-const { URL } = require('url');
+const {
+    URL
+} = require('url');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,14 +24,24 @@ const getMimeType = url => {
 };
 
 app.get('/', (req, res) => {
-    const { url } = req.query; // get url parameter
+    const {
+        url
+    } = req.query; // get url parameter
     if (!url) {
         res.type('text/html');
         return res.end("You need to specify <code>url</code> query parameter");
     }
-
-    axios.get(url, { responseType: 'arraybuffer' }) // set response type array buffer to access raw data
-        .then(({ data }) => {
+    const config = {
+        responseType: 'arraybuffer',
+        headers: {
+            "Referer": "http://demo.cvm.vn/",
+            "Referrer-Policy": "strict-origin-when-cross-origin"
+        }
+    };
+    axios.get(url, config) // set response type array buffer to access raw data
+        .then(({
+            data
+        }) => {
             const urlMime = getMimeType(url); // get mime type of the requested url
             if (urlMime === 'text/html') { // replace links only in html
                 data = data.toString().replace(regex, (match, p1, p2) => {
@@ -67,8 +79,12 @@ app.get('/*', (req, res) => {
     }
 
     const url = lastProtoHost + req.originalUrl;
-    axios.get(url, { responseType: 'arraybuffer' }) // set response type array buffer to access raw data
-        .then(({ data }) => {
+    axios.get(url, {
+            responseType: 'arraybuffer'
+        }) // set response type array buffer to access raw data
+        .then(({
+            data
+        }) => {
             const urlMime = getMimeType(url); // get mime type of the requested url
             res.type(urlMime);
             res.send(data);
